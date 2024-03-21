@@ -97,3 +97,6 @@ target_link_libraries(test_stereo_match ${catkin_LIBRARIES} ${OpenCV_LIBS}
 add_executable(rect_cal_imgs_disp src/rect_cal_imgs_disp.cc)
 target_link_libraries(rect_cal_imgs_disp ${catkin_LIBRARIES} ${OpenCV_LIBS}
                       yaml-cpp)
+
+add_executable(resize_image src/resize_image.cc)
+target_link_libraries(resize_image ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
