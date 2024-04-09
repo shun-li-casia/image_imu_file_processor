@@ -19,6 +19,7 @@
 #include "image_imu_file_processor/imu_reader.h"
 #include "image_imu_file_processor/img_file_name_checker.h"
 #include "image_imu_file_processor/img_decoder.h"
+#include "utility_tool/system_lib.h"
 #include "utility_tool/print_ctrl_macro.h"
 #include "utility_tool/system_lib.h"
 

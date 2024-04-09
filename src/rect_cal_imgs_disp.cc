@@ -15,6 +15,7 @@
  *******************************************************************************/
 
 #include "utility_tool/cmdline.h"
+#include "utility_tool/system_lib.h"
 #include "utility_tool/pcm_debug_helper.h"
 #include "sensor_config/camera_models_kalibr.h"
 

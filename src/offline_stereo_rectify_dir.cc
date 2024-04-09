@@ -14,6 +14,7 @@
  *******************************************************************************/
 
 #include "utility_tool/cmdline.h"
+#include "utility_tool/system_lib.h"
 #include "utility_tool/print_ctrl_macro.h"
 #include "utility_tool/pcm_debug_helper.h"
 #include "image_algorithm/stereo_rectifier.h"

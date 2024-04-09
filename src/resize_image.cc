@@ -24,6 +24,8 @@
 int main(int argc, char **argv) {
   cmdline::parser par;
   par.add<std::string>("data_path", 0, "the images path", true);
+  par.parse_check(argc, argv);
+
   const std::string data_path = par.get<std::string>("data_path");
   std::vector<std::string> imgs_name;
   utility_tool::GetFilesInDirectory(data_path, &imgs_name);
