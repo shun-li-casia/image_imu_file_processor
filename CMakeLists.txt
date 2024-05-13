@@ -20,7 +20,6 @@ find_package(
   cv_bridge
   image_algorithm
   sensor_config
-  camera_models
   utility_tool)
 
 # System dependencies are found with CMake's conventions
@@ -44,7 +43,6 @@ catkin_package(
   rosbag
   image_algorithm
   sensor_config
-  camera_models
   utility_tool)
 
 add_executable(test_img_decoder src/test_img_decoder.cc)

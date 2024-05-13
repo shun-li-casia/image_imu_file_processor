@@ -59,8 +59,8 @@ int main(int argc, char** argv) {
   // apply the rect
   Eigen::Matrix3d rect_r_rl;
   Eigen::Vector3d rect_t_rl;
-  camodocal::PinholeCamera::Parameters& l_cam = config.cam_params_[0];
-  camodocal::PinholeCamera::Parameters& r_cam = config.cam_params_[1];
+  sensor_config::PinholeCamera::Parameters& l_cam = config.cam_params_[0];
+  sensor_config::PinholeCamera::Parameters& r_cam = config.cam_params_[1];
   std::pair<cv::Mat, cv::Mat> l_map, r_map;
 
   // apply the rect

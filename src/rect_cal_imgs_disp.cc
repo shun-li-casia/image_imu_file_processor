@@ -47,8 +47,8 @@ int main(int argc, char** argv) {
   // generate the map for rectification
   Eigen::Matrix3d rect_Rrl;
   Eigen::Vector3d rect_trl;
-  camodocal::PinholeCamera::Parameters l_cam = conf.cam_params_[0];
-  camodocal::PinholeCamera::Parameters r_cam = conf.cam_params_[1];
+  sensor_config::PinholeCamera::Parameters l_cam = conf.cam_params_[0];
+  sensor_config::PinholeCamera::Parameters r_cam = conf.cam_params_[1];
   std::pair<cv::Mat, cv::Mat> l_map, r_map;
 
   image_algorithm::StereoRectifier::RectStereoParam(
