@@ -17,10 +17,10 @@
 #include "utility_tool/cmdline.h"
 #include "utility_tool/system_lib.h"
 #include "utility_tool/pcm_debug_helper.h"
-#include "sensor_config/camera_models_kalibr.h"
+#include "sensor_config/modules/stereo_cam_config_manager.h"
 
 #include "image_algorithm/disparity_calculator.h"
-#include "image_algorithm/stereo_rectifier.h"
+#include "sensor_config/modules/stereo_rectifier.h"
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
   // read the kailbr config
   const std::string kalibr_param = par.get<std::string>("kalibr_param");
   const double scale = par.get<double>("img_scale");
-  sensor_config::ImgImuConfig conf;
-  sensor_config::ConfigManager::ReadKalibr(kalibr_param, &conf, scale);
+  sensor_config::StereoCamConfig conf;
+  sensor_config::StereoCamConfigManager::ReadKalibr(kalibr_param, &conf, scale);
 
   // generate the map for rectification
   Eigen::Matrix3d rect_Rrl;
@@ -51,12 +51,12 @@ int main(int argc, char** argv) {
   sensor_config::PinholeCamera::Parameters r_cam = conf.cam_params_[1];
   std::pair<cv::Mat, cv::Mat> l_map, r_map;
 
-  image_algorithm::StereoRectifier::RectStereoParam(
-      conf.r_rl_, conf.t_rl_, &rect_Rrl, &rect_trl, &l_cam, &r_cam, &l_map,
-      &r_map);
+  sensor_config::StereoRectifier::RectStereoParam(conf.r_rl_, conf.t_rl_,
+                                                  &rect_Rrl, &rect_trl, &l_cam,
+                                                  &r_cam, &l_map, &r_map);
 
   // generate the rected kailbr config
-  sensor_config::ImgImuConfig rect_conf;
+  sensor_config::StereoCamConfig rect_conf;
   rect_conf.r_rl_ = rect_Rrl;
   rect_conf.t_rl_ = rect_trl;
   rect_conf.cam_params_.push_back(l_cam);
@@ -64,7 +64,8 @@ int main(int argc, char** argv) {
   rect_conf.rostopic_.push_back(conf.rostopic_[0] + "_rect");
   rect_conf.rostopic_.push_back(conf.rostopic_[1] + "_rect");
   rect_conf.cam_overlaps_ = conf.cam_overlaps_;
-  sensor_config::ConfigManager::WriteKalibr(rect_conf, "rect_" + kalibr_param);
+  sensor_config::StereoCamConfigManager::WriteKalibr(rect_conf,
+                                                     "rect_" + kalibr_param);
 
   ros::init(argc, argv, "rect_cal_imgs_disp_node");
   ros::NodeHandle nh;
@@ -120,7 +121,7 @@ int main(int argc, char** argv) {
 
     cv::Mat disp, rgb_disp;
     calculator.CalcuDisparitySGBM(l_rect_img, r_rect_img, param, &disp,
-                                        &rgb_disp);
+                                  &rgb_disp);
     sensor_msgs::ImagePtr disp_msg =
         cv_bridge::CvImage(header, "bgr8", rgb_disp).toImageMsg();
     disp_rgb_pub.publish(disp_msg);

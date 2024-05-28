@@ -98,3 +98,6 @@ target_link_libraries(rect_cal_imgs_disp ${catkin_LIBRARIES} ${OpenCV_LIBS}
 
 add_executable(resize_image src/resize_image.cc)
 target_link_libraries(resize_image ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
+
+add_executable(rosbag_img_interval_check src/tool/rosbag_img_interval_check.cc)
+target_link_libraries(rosbag_img_interval_check ${catkin_LIBRARIES})

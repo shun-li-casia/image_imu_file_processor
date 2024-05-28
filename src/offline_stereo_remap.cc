@@ -17,8 +17,8 @@
 #include "utility_tool/print_ctrl_macro.h"
 #include "utility_tool/pcm_debug_helper.h"
 
-#include "sensor_config/camera_models_kalibr.h"
-#include "image_algorithm/stereo_rectifier.h"
+#include "sensor_config/modules/stereo_cam_config_manager.h"
+#include "sensor_config/modules/stereo_rectifier.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,13 +71,13 @@ int main(int argc, char** argv) {
 
   const int num_of_stereo = calib_files.size();
 
-  std::vector<sensor_config::ImgImuConfig> config;
+  std::vector<sensor_config::StereoCamConfig> config;
   config.resize(num_of_stereo);
   for (int i = 0; i < num_of_stereo; ++i) {
-    sensor_config::ImgImuConfig& c = config[i];
+    sensor_config::StereoCamConfig& c = config[i];
     PCM_PRINT_INFO("read raw stereo calibration from %s \n",
                    calib_files[i].c_str());
-    sensor_config::ConfigManager::ReadKalibr(calib_files[i], &c);
+    sensor_config::StereoCamConfigManager::ReadKalibr(calib_files[i], &c);
   }
 
   std::vector<std::pair<cv::Mat, cv::Mat>> stereo_maps;
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
     std::pair<cv::Mat, cv::Mat> l_map, r_map;
 
     // apply the rect
-    image_algorithm::StereoRectifier::RectStereoParam(
+    sensor_config::StereoRectifier::RectStereoParam(
         config[i].r_rl_, config[i].t_rl_, &rect_r_rl, &rect_t_rl, &l_cam,
         &r_cam, &l_map, &r_map);
     config[i].r_rl_ = rect_r_rl;

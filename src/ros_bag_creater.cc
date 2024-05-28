@@ -19,7 +19,7 @@
 #include "utility_tool/pcm_debug_helper.h"
 #include "image_imu_file_processor/img_imu_align.h"
 #include "image_imu_file_processor/img_file_name_checker.h"
-#include "image_algorithm/stereo_rectifier.h"
+#include "sensor_config/modules/stereo_rectifier.h"
 
 #include <ros/ros.h>
 #include <rosbag/bag.h>

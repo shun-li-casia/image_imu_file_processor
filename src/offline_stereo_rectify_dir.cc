@@ -17,8 +17,8 @@
 #include "utility_tool/system_lib.h"
 #include "utility_tool/print_ctrl_macro.h"
 #include "utility_tool/pcm_debug_helper.h"
-#include "image_algorithm/stereo_rectifier.h"
-#include "sensor_config/camera_models_kalibr.h"
+#include "sensor_config/modules/stereo_rectifier.h"
+#include "sensor_config/modules/stereo_cam_config_manager.h"
 
 #include <ros/ros.h>
 #include <rosbag/bag.h>
@@ -46,15 +46,15 @@ int main(int argc, char** argv) {
   const std::string stereo_calibra_files =
       par.get<std::string>("stereo_calibra_files");
 
-  sensor_config::ImgImuConfig config;
+  sensor_config::StereoCamConfig config;
   PCM_PRINT_INFO("read raw stereo calibration from %s \n",
                  stereo_calibra_files.c_str());
 
   const int down_factor = par.get<int>("down_factor");
 
   // recover the intrinsic from downsample
-  sensor_config::ConfigManager::ReadKalibr(stereo_calibra_files, &config,
-                                                 down_factor);
+  sensor_config::StereoCamConfigManager::ReadKalibr(stereo_calibra_files,
+                                                    &config, down_factor);
 
   // apply the rect
   Eigen::Matrix3d rect_r_rl;
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
   std::pair<cv::Mat, cv::Mat> l_map, r_map;
 
   // apply the rect
-  image_algorithm::StereoRectifier::RectStereoParam(
+  sensor_config::StereoRectifier::RectStereoParam(
       config.r_rl_, config.t_rl_, &rect_r_rl, &rect_t_rl, &l_cam, &r_cam,
       &l_map, &r_map);
   config.r_rl_ = rect_r_rl;
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 
   std::string data_path = par.get<std::string>("data_path");
 
-  sensor_config::ConfigManager::WriteKalibr(
+  sensor_config::StereoCamConfigManager::WriteKalibr(
       config, data_path + "/rect_" + stereo_calibra_files);
 
   std::string left_dir = data_path + "/left";
