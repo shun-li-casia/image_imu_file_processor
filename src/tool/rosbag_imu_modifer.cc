@@ -51,6 +51,22 @@ void adjustImuAccelerationAndSave(const std::string& input_bag_path,
       modified_imu_msg.linear_acceleration.y *= adjustment_factor;
       modified_imu_msg.linear_acceleration.z *= adjustment_factor;
 
+      PCM_PRINT_DEBUG(
+          "org imu_msg: %u-%u, %lf, %lf, %lf, %lf, %lf, %lf\n",
+          imu_msg->header.stamp.sec, imu_msg->header.stamp.nsec,
+          imu_msg->angular_velocity.x, imu_msg->angular_velocity.y,
+          imu_msg->angular_velocity.z, imu_msg->linear_acceleration.x,
+          imu_msg->linear_acceleration.y, imu_msg->linear_acceleration.z);
+      PCM_PRINT_DEBUG("mod imu_msg: %u-%u, %lf, %lf, %lf, %lf, %lf, %lf\n",
+                      modified_imu_msg.header.stamp.sec,
+                      modified_imu_msg.header.stamp.nsec,
+                      modified_imu_msg.angular_velocity.x,
+                      modified_imu_msg.angular_velocity.y,
+                      modified_imu_msg.angular_velocity.z,
+                      modified_imu_msg.linear_acceleration.x,
+                      modified_imu_msg.linear_acceleration.y,
+                      modified_imu_msg.linear_acceleration.z);
+
       // 写入新bag，使用原始topic名称
       out_bag.write(imu_topic, m.getTime(), modified_imu_msg);
     }
