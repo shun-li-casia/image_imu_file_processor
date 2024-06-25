@@ -102,5 +102,8 @@ target_link_libraries(resize_image ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
 add_executable(rosbag_img_interval_check src/tool/rosbag_img_interval_check.cc)
 target_link_libraries(rosbag_img_interval_check ${catkin_LIBRARIES})
 
+add_executable(rosbag_imu_interval_check src/tool/rosbag_imu_interval_check.cc)
+target_link_libraries(rosbag_imu_interval_check ${catkin_LIBRARIES})
+
 add_executable(rosbag_imu_modifer src/tool/rosbag_imu_modifer.cc)
 target_link_libraries(rosbag_imu_modifer ${catkin_LIBRARIES})

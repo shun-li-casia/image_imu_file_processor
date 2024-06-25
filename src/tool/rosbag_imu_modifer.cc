@@ -13,6 +13,7 @@
  *
  *******************************************************************************/
 
+#include "sensor_msgs/Image.h"
 #include "utility_tool/print_ctrl_macro.h"
 #include "utility_tool/pcm_debug_helper.h"
 #include "utility_tool/cmdline.h"
@@ -34,41 +35,49 @@ void adjustImuAccelerationAndSave(const std::string& input_bag_path,
   // 创建目标bag文件
   rosbag::Bag out_bag(output_bag_path, rosbag::bagmode::Write);
 
-  // 获取源bag中的imu数据
-  std::vector<std::string> topics;
-  topics.push_back(imu_topic);  // 假设imu数据发布在"/imu/data"话题上
-  rosbag::View view(in_bag, rosbag::TopicQuery(topics));
+  rosbag::View view_all(in_bag);
 
-  // 遍历bag中的每一条imu消息
-  BOOST_FOREACH (rosbag::MessageInstance const m, view) {
-    sensor_msgs::Imu::ConstPtr imu_msg = m.instantiate<sensor_msgs::Imu>();
-    if (imu_msg != nullptr) {
-      // 创建一个新的Imu消息实例，用于存储修改后的数据
-      sensor_msgs::Imu modified_imu_msg(*imu_msg);
+  // 遍历bag中的每一条消息
+  for (const rosbag::ConnectionInfo* ci : view_all.getConnections()) {
+    std::string topic = ci->topic;
+    if (topic == imu_topic) {
+      rosbag::View view_imu(in_bag, rosbag::TopicQuery(topic));
+      BOOST_FOREACH (rosbag::MessageInstance const m, view_imu) {
+        sensor_msgs::Imu::ConstPtr imu_msg = m.instantiate<sensor_msgs::Imu>();
+        if (imu_msg != nullptr) {
+          // 创建一个新的Imu消息实例，用于存储修改后的数据
+          sensor_msgs::Imu modified_imu_msg(*imu_msg);
 
-      // 修改加速度值（乘以一个因子作为示例）
-      modified_imu_msg.linear_acceleration.x *= adjustment_factor;
-      modified_imu_msg.linear_acceleration.y *= adjustment_factor;
-      modified_imu_msg.linear_acceleration.z *= adjustment_factor;
+          // 修改加速度值（乘以一个因子作为示例）
+          modified_imu_msg.linear_acceleration.x *= adjustment_factor;
+          modified_imu_msg.linear_acceleration.y *= adjustment_factor;
+          modified_imu_msg.linear_acceleration.z *= adjustment_factor;
 
-      PCM_PRINT_DEBUG(
-          "org imu_msg: %u-%u, %lf, %lf, %lf, %lf, %lf, %lf\n",
-          imu_msg->header.stamp.sec, imu_msg->header.stamp.nsec,
-          imu_msg->angular_velocity.x, imu_msg->angular_velocity.y,
-          imu_msg->angular_velocity.z, imu_msg->linear_acceleration.x,
-          imu_msg->linear_acceleration.y, imu_msg->linear_acceleration.z);
-      PCM_PRINT_DEBUG("mod imu_msg: %u-%u, %lf, %lf, %lf, %lf, %lf, %lf\n",
-                      modified_imu_msg.header.stamp.sec,
-                      modified_imu_msg.header.stamp.nsec,
-                      modified_imu_msg.angular_velocity.x,
-                      modified_imu_msg.angular_velocity.y,
-                      modified_imu_msg.angular_velocity.z,
-                      modified_imu_msg.linear_acceleration.x,
-                      modified_imu_msg.linear_acceleration.y,
-                      modified_imu_msg.linear_acceleration.z);
+          PCM_PRINT_DEBUG(
+              "org imu_msg: %u-%u, %lf, %lf, %lf, %lf, %lf, %lf\n",
+              imu_msg->header.stamp.sec, imu_msg->header.stamp.nsec,
+              imu_msg->angular_velocity.x, imu_msg->angular_velocity.y,
+              imu_msg->angular_velocity.z, imu_msg->linear_acceleration.x,
+              imu_msg->linear_acceleration.y, imu_msg->linear_acceleration.z);
+          PCM_PRINT_DEBUG("mod imu_msg: %u-%u, %lf, %lf, %lf, %lf, %lf, %lf\n",
+                          modified_imu_msg.header.stamp.sec,
+                          modified_imu_msg.header.stamp.nsec,
+                          modified_imu_msg.angular_velocity.x,
+                          modified_imu_msg.angular_velocity.y,
+                          modified_imu_msg.angular_velocity.z,
+                          modified_imu_msg.linear_acceleration.x,
+                          modified_imu_msg.linear_acceleration.y,
+                          modified_imu_msg.linear_acceleration.z);
 
-      // 写入新bag，使用原始topic名称
-      out_bag.write(imu_topic, m.getTime(), modified_imu_msg);
+          // 写入新bag，使用原始topic名称
+          out_bag.write(imu_topic, m.getTime(), modified_imu_msg);
+        }
+      }
+    } else {
+      rosbag::View view_other(in_bag, rosbag::TopicQuery(topic));
+      BOOST_FOREACH (rosbag::MessageInstance const m, view_other) {
+        out_bag.write(topic, m.getTime(), m);
+      }
     }
   }
 
