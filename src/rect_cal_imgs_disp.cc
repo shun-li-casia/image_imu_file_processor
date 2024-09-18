@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 
   // the disparity calculator
   image_algorithm::DisparityCalculator calculator;
-  image_algorithm::DisparityCalculator::Param param;
+  image_algorithm::DisparityCalculator::SGBMParam param;
   param.block_size = 5;
   param.num_disparities = 64;
 

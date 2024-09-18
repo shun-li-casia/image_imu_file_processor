@@ -14,6 +14,7 @@
  *******************************************************************************/
 
 #include "image_algorithm/disparity_calculator.h"
+#include "utility_tool/print_ctrl_macro.h"
 #include "utility_tool/system_lib.h"
 #include "utility_tool/cmdline.h"
 
@@ -47,7 +48,7 @@ int main(int argc, char **argv) {
 
   assert(l_imgs_name.size() == r_imgs_name.size());
 
-  image_algorithm::DisparityCalculator::Param param;
+  image_algorithm::DisparityCalculator::SGBMParam param;
   param.ReadFromYaml(par.get<std::string>("sbgm_cfg"));
 
   image_algorithm::DisparityCalculator calculator;
@@ -83,7 +84,8 @@ int main(int argc, char **argv) {
     }
 
     cv::Mat disp, rgb_disp;
-    calculator.CalcuDisparitySGBM(l_tmp_img, r_tmp_img, param, &disp, &rgb_disp);
+    calculator.CalcuDisparitySGBM(l_tmp_img, r_tmp_img, param, &disp,
+                                  &rgb_disp);
     // calculator.CalcuDisparityCuda(l_tmp_img, r_tmp_img, &disp, &rgb_disp);
 
     char img_index[11];

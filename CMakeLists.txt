@@ -107,3 +107,6 @@ target_link_libraries(rosbag_imu_interval_check ${catkin_LIBRARIES})
 
 add_executable(rosbag_imu_modifer src/tool/rosbag_imu_modifer.cc)
 target_link_libraries(rosbag_imu_modifer ${catkin_LIBRARIES})
+
+add_executable(rosbag_img_to_file src/tool/rosbag_img_to_file.cc)
+target_link_libraries(rosbag_img_to_file ${catkin_LIBRARIES} ${OpenCV_LIBS})

@@ -47,8 +47,7 @@ int main(int argc, char** argv) {
   int fps = par.get<int>("fps");
 
   std::vector<std::string> topic_vec =
-      utility_tool::cmdline_multi::ParseMultiArgs<std::string>(topics, ',',
-                                                               nullptr);
+      utility_tool::cmdline_multi::ParseMultiArgs<std::string>(topics, ',');
   PCM_PRINT_DEBUG("topics = \n");
   for (auto topic : topic_vec) {
     std::cout << topic << std::endl;
