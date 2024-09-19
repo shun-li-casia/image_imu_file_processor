@@ -110,3 +110,6 @@ target_link_libraries(rosbag_imu_modifer ${catkin_LIBRARIES})
 
 add_executable(rosbag_img_to_file src/tool/rosbag_img_to_file.cc)
 target_link_libraries(rosbag_img_to_file ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(tp_checker src/tp_checker.cc)
+target_link_libraries(tp_checker ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
