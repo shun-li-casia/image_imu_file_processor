@@ -48,9 +48,12 @@ int main(int argc, char** argv) {
 
   std::vector<std::string> topic_vec =
       utility_tool::cmdline_multi::ParseMultiArgs<std::string>(topics, ',');
-  PCM_PRINT_DEBUG("topics = \n");
-  for (auto topic : topic_vec) {
-    std::cout << topic << std::endl;
+
+  if (topic_vec.empty()) {
+    PCM_PRINT_ERROR("topic_vec is empty!\n");
+    return 0;
+  } else {
+    PCM_STREAM_CONTAINER_DEBUG(topic_vec);
   }
 
   // create the output
@@ -115,13 +118,14 @@ int main(int argc, char** argv) {
             }
             cv::resize(cv_ptr->image, cv_ptr->image, cv::Size(width, height));
             std::string out_path = out_paths[i];
-            cv::imwrite(out_path + "/" + std::to_string(img->header.stamp.sec) +
-                            "_" + std::to_string(img->header.stamp.nsec) + "." +
-                            ex,
-                        cv_ptr->image);
+            std::stringstream ss;
+            ss << std::setfill('0') << std::setw(6) << img->header.stamp.sec;
+            ss << "_" << std::setfill('0') << std::setw(9)
+               << img->header.stamp.nsec;
 
-            PCM_PRINT_DEBUG("image %u-%u\n", img->header.stamp.sec,
-                            img->header.stamp.nsec);
+            cv::imwrite(out_path + "/" + ss.str() + "." + ex, cv_ptr->image);
+
+            PCM_PRINT_DEBUG("image %s\n", ss.str().c_str());
           }
         } else if (type == "video") {
           sensor_msgs::Image::ConstPtr img =
