@@ -113,3 +113,6 @@ target_link_libraries(rosbag_img_to_file ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(tp_checker src/tp_checker.cc)
 target_link_libraries(tp_checker ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
+
+add_executable(click_read_image src/click_read_image.cc)
+target_link_libraries(click_read_image ${catkin_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
