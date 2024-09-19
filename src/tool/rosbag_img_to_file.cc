@@ -30,12 +30,15 @@
 int main(int argc, char** argv) {
   cmdline::parser par;
   par.add<std::string>("type", 'i', "save as image or video", true);
-  par.add<int>("fps", 'f', "the fps of video", true);
+  par.add<float>("fps", 'f',
+                 "the fps of video, for image, only save the image as fps",
+                 true);
   par.add<int>("height", 'h', "the height of image", true);
   par.add<int>("width", 'w', "the width of image", true);
   par.add<std::string>("ex", 'e', "the extension name, png, jpg or mp4~", true);
   par.add<std::string>("topics", 't', "topic name, use ',' to seperate", true);
   par.add<std::string>("bag", 'b', "ros bag name", true);
+  par.add<int>("preview", 'p', "if preview th image", true);
   par.parse_check(argc, argv);
 
   std::string bag_name = par.get<std::string>("bag");
@@ -44,7 +47,8 @@ int main(int argc, char** argv) {
   std::string ex = par.get<std::string>("ex");
   int height = par.get<int>("height");
   int width = par.get<int>("width");
-  int fps = par.get<int>("fps");
+  float fps = par.get<float>("fps");
+  bool if_preview = par.get<int>("preview") == 1;
 
   std::vector<std::string> topic_vec =
       utility_tool::cmdline_multi::ParseMultiArgs<std::string>(topics, ',');
@@ -99,6 +103,9 @@ int main(int argc, char** argv) {
     }
   }
 
+  std::vector<ros::Time> last_tp_vec;
+  last_tp_vec.resize(topic_vec.size(), ros::Time(0, 0));
+
   while (view_iter != view.end()) {
     std::string topic = view_iter->getTopic();
 
@@ -116,6 +123,16 @@ int main(int argc, char** argv) {
               ROS_ERROR("cv_bridge exception: %s", e.what());
               return 0;
             }
+
+            if (last_tp_vec[i] == ros::Time(0, 0)) {
+              last_tp_vec[i] = img->header.stamp;
+            } else {
+              float tmp_fps =
+                  1.0f / (img->header.stamp - last_tp_vec[i]).toSec();
+              if (tmp_fps > fps) continue;
+              last_tp_vec[i] = img->header.stamp;
+            }
+
             cv::resize(cv_ptr->image, cv_ptr->image, cv::Size(width, height));
             std::string out_path = out_paths[i];
             std::stringstream ss;
@@ -126,6 +143,11 @@ int main(int argc, char** argv) {
             cv::imwrite(out_path + "/" + ss.str() + "." + ex, cv_ptr->image);
 
             PCM_PRINT_DEBUG("image %s\n", ss.str().c_str());
+
+            if (if_preview) {
+              cv::imshow(topic, cv_ptr->image);
+              cv::waitKey(1);
+            }
           }
         } else if (type == "video") {
           sensor_msgs::Image::ConstPtr img =
@@ -142,6 +164,11 @@ int main(int argc, char** argv) {
             cv::resize(cv_ptr->image, cv_ptr->image, cv::Size(width, height));
             // write to the video
             video_writers[i]->write(cv_ptr->image);
+
+            if (if_preview) {
+              cv::imshow(topic, cv_ptr->image);
+              cv::waitKey(0);
+            }
             PCM_PRINT_DEBUG("image %u-%u\n", img->header.stamp.sec,
                             img->header.stamp.nsec);
           }
